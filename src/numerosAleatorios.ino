@@ -4,10 +4,14 @@
  ***********************************************************************
  */
 int azar;
-int senal = 8;
-int ts = 200; // millis
-int ejeX = 6;
-int ejeY= 7;
+int senal = 5;
+int ts = 20; // tiempo en millis
+
+int tensionX, tensionY; // valor analogico de tension
+int X = 11;
+int menosX = 10;
+int Y= 9;
+int menosY = 8;
 
 /*
  ***********************************************************************
@@ -16,9 +20,11 @@ int ejeY= 7;
  */
 void setup(){
   Serial.begin(9600);    // Tasa de baudios del puerto serial
-  pinMode (senal, OUTPUT); // Salidas de pulso
-  pinMode (ejeX, OUTPUT); // Nivel de tension sobre el eje X
-  pinMode (ejeY, OUTPUT); // Nivel de tension sobre el eje Y
+  pinMode (senal, OUTPUT); // Señal de pulsos aleatorios
+  pinMode (X, OUTPUT); // Salida de tension sobre el eje X
+  pinMode (Y, OUTPUT); // "               " sobre el eje Y
+  pinMode (menosX, OUTPUT); // Salida de tension sobre el eje -X
+  pinMode (menosY, OUTPUT); // "               " sobre el eje -Y
 }
 
  /*
@@ -29,10 +35,8 @@ void setup(){
 void loop(){
   numeroAletorio();
   generaSenal();
-  tensionCuadratura();
-  delay(ts);
-  }
 
+  }
 
 void numeroAletorio(){
     /*Si cargamos un #constante como semilla generamos
@@ -45,6 +49,9 @@ void numeroAletorio(){
 
 void generaSenal(){
   if(azar == 0){ // Si el numero aleatorio es 0 = 000
+    tensionX = 100;
+    tensionY = 0;
+    primerCuadrante(); // x,y
       digitalWrite(senal,LOW);
       delay(ts);
       digitalWrite(senal,LOW);
@@ -53,6 +60,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 1){ // Si el numero aleatorio es 1 = 001
+    tensionX = 0;
+    tensionY = 100;
+    primerCuadrante();
       digitalWrite(senal,LOW);
       delay(ts);
       digitalWrite(senal,LOW);
@@ -61,6 +71,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 2){ // Si el numero aleatorio es 2 = 010
+    tensionX = 200;
+    tensionY = 200;
+    primerCuadrante();
       digitalWrite(senal,LOW);
       delay(ts);
       digitalWrite(senal,HIGH);
@@ -69,6 +82,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 3){ // Si el numero aleatorio es 3 = 011
+    tensionX = 100;
+    tensionY = 0;
+    segundoCuadrante(); // -x,y
       digitalWrite(senal,LOW);
       delay(ts);
       digitalWrite(senal,HIGH);
@@ -77,6 +93,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 4){ // Si el numero aleatorio es 4 = 100
+    tensionX = 200;
+    tensionY = 200;
+    segundoCuadrante();
       digitalWrite(senal,HIGH);
       delay(ts);
       digitalWrite(senal,LOW);
@@ -85,6 +104,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 5){ // Si el numero aleatorio es 6 = 101
+    tensionX = 0;
+    tensionY = 100;
+    tercerCuadrante();
       digitalWrite(senal,HIGH);
       delay(ts);
       digitalWrite(senal,LOW);
@@ -93,6 +115,9 @@ void generaSenal(){
       delay(ts);
     }
   if(azar == 6){ // Si el numero aleatorio es 6 = 110
+    tensionX = 200;
+    tensionY = 200;
+    tercerCuadrante();
       digitalWrite(senal,HIGH);
       delay(ts);
       digitalWrite(senal,HIGH);
@@ -101,18 +126,43 @@ void generaSenal(){
       delay(ts);
     }else{ // Si el numero aleatorio es 7 = 111
       //(azar == 7){
-      digitalWrite(senal,HIGH);
-      delay(ts);
-      digitalWrite(senal,HIGH);
-      delay(ts);
-      digitalWrite(senal,HIGH);
-      delay(ts);
+      tensionX = 200;
+      tensionY = 200;
+      cuartoCuadrante();
+        digitalWrite(senal,HIGH);
+        delay(ts);
+        digitalWrite(senal,HIGH);
+        delay(ts);
+        digitalWrite(senal,HIGH);
+        delay(ts);
     }
 }
 
-void tensionCuadratura(){
-  if(azar <= 3){
-    digitalWrite(ejeX,30);
-    digitalWrite(ejeY,30);
-  }
+void primerCuadrante(){
+    analogWrite(X,tensionX);
+    analogWrite(Y,tensionY);
+    analogWrite(menosX, 0);
+    analogWrite(menosY, 0);
+
+}
+
+void segundoCuadrante(){
+    analogWrite(menosX,tensionX);
+    analogWrite(Y,tensionY);
+    analogWrite(X, 0);
+    analogWrite(menosY, 0);
+}
+
+void tercerCuadrante(){
+    analogWrite(menosX,tensionX);
+    analogWrite(menosY,tensionY);
+    analogWrite(X, 0);
+    analogWrite(Y, 0);
+}
+
+void cuartoCuadrante(){
+    analogWrite(X,tensionX);
+    analogWrite(menosY,tensionY);
+    analogWrite(menosX, 0);
+    analogWrite(Y, 0);
 }
