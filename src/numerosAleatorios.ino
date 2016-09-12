@@ -5,7 +5,7 @@
  */
 int azar;
 int senal = 5;
-int ts = 20; // tiempo en millis
+int ts = 1000; // tiempo en millis
 
 int tensionX, tensionY; // valor analogico de tension
 int X = 11;
@@ -59,7 +59,7 @@ void generaSenal(){
       digitalWrite(senal,LOW);
       delay(ts);
     }
-  if(azar == 1){ // Si el numero aleatorio es 1 = 001
+  else if(azar == 1){ // Si el numero aleatorio es 1 = 001
     tensionX = 0;
     tensionY = 100;
     primerCuadrante();
@@ -70,7 +70,7 @@ void generaSenal(){
       digitalWrite(senal,HIGH);
       delay(ts);
     }
-  if(azar == 2){ // Si el numero aleatorio es 2 = 010
+  else if(azar == 2){ // Si el numero aleatorio es 2 = 010
     tensionX = 200;
     tensionY = 200;
     primerCuadrante();
@@ -81,7 +81,7 @@ void generaSenal(){
       digitalWrite(senal,LOW);
       delay(ts);
     }
-  if(azar == 3){ // Si el numero aleatorio es 3 = 011
+  else if(azar == 3){ // Si el numero aleatorio es 3 = 011
     tensionX = 100;
     tensionY = 0;
     segundoCuadrante(); // -x,y
@@ -92,7 +92,7 @@ void generaSenal(){
       digitalWrite(senal,HIGH);
       delay(ts);
     }
-  if(azar == 4){ // Si el numero aleatorio es 4 = 100
+  else if(azar == 4){ // Si el numero aleatorio es 4 = 100
     tensionX = 200;
     tensionY = 200;
     segundoCuadrante();
@@ -103,7 +103,7 @@ void generaSenal(){
       digitalWrite(senal,LOW);
       delay(ts);
     }
-  if(azar == 5){ // Si el numero aleatorio es 6 = 101
+  else if(azar == 5){ // Si el numero aleatorio es 6 = 101
     tensionX = 0;
     tensionY = 100;
     tercerCuadrante();
@@ -114,7 +114,7 @@ void generaSenal(){
       digitalWrite(senal,HIGH);
       delay(ts);
     }
-  if(azar == 6){ // Si el numero aleatorio es 6 = 110
+  else if(azar == 6){ // Si el numero aleatorio es 6 = 110
     tensionX = 200;
     tensionY = 200;
     tercerCuadrante();
