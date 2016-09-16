@@ -18,6 +18,18 @@ const byte pinInSenalDigital = 4; // Pin de entrada de la senal digital
 
 bool estadoClk1 = LOW; // Estado inicial de clk1
 
+const byte pinX = 8;
+const byte pinY = 9;
+const byte pinFalsaTierra = 7;
+
+const byte falsaTierra = 127;
+const byte R = 255;
+const byte menosR = 0;
+const byte Rmedios = 191;
+const byte menosRmedios = 64;
+
+volatile bool buffer[] = {LOW, LOW, LOW};
+
 /*
  ***********************************************************************
  *              SETUP CONFIGURACIÓN INICIAL
@@ -29,10 +41,10 @@ void setup() {
   pinMode(pinOutSenalDigital, OUTPUT);      // Señal de pulsos aleatorios
   pinMode(pinInClk1, INPUT_PULLUP); // Pin como entrada de la interrupcion
   pinMode(pinOutClk1, OUTPUT);      // Señal clk1
-  // pinMode(pinX, OUTPUT);               // Salida de tension sobre el eje X
-  // pinMode(pinY, OUTPUT);               // "               " sobre el eje Y
-  // pinMode(pinmenosX, OUTPUT);          // Salida de tension sobre el eje -X
-  // pinMode(pinmenosY, OUTPUT);          // "               " sobre el eje -Y
+  pinMode(pinX, OUTPUT);            // Salida de tension sobre el eje X
+  pinMode(pinY, OUTPUT);            // "               " sobre el eje Y
+  pinMode(pinFalsaTierra, OUTPUT);  // Referencia de Salida X y Y
+  analogWrite(pinFalsaTierra, falsaTierra);
   pinMode(ledPin, OUTPUT);
   Timer1.initialize(deltaT); // 180 ms
   Timer1.attachInterrupt(ISR_Callback);
@@ -48,6 +60,7 @@ void setup() {
 void loop() {
   int numeroAleatorio = generadorNumeroAletorio();
   generaSenalAleatoria(numeroAleatorio);
+  codificar();
 }
 
 int generadorNumeroAletorio() {
@@ -56,6 +69,7 @@ int generadorNumeroAletorio() {
      generamos numeros aleatorios*/
   randomSeed(analogRead(0));
   int azar = random(0, 8); // genera numero aleatorio desde random(n,(m-1))
+  // azar = 0;
   Serial.println("Azar:" + String(azar));
   return azar;
 }
@@ -89,34 +103,6 @@ void generaSenalAleatoria(int azar) {
   }
 }
 
-// void primerCuadrante() {
-//   analogWrite(pinX, tensionX);
-//   analogWrite(pinY, tensionY);
-//   analogWrite(pinmenosX, 0);
-//   analogWrite(pinmenosY, 0);
-// }
-//
-// void segundoCuadrante() {
-//   analogWrite(pinmenosX, tensionX);
-//   analogWrite(pinY, tensionY);
-//   analogWrite(pinX, 0);
-//   analogWrite(pinmenosY, 0);
-// }
-//
-// void tercerCuadrante() {
-//   analogWrite(pinmenosX, tensionX);
-//   analogWrite(pinmenosY, tensionY);
-//   analogWrite(pinX, 0);
-//   analogWrite(pinY, 0);
-// }
-//
-// void cuartoCuadrante() {
-//   analogWrite(pinX, tensionX);
-//   analogWrite(pinmenosY, tensionY);
-//   analogWrite(pinmenosX, 0);
-//   analogWrite(pinY, 0);
-// }
-
 void escribirSenalDigital(bool bit1, bool bit2, bool bit3) {
   cambiarYEnviarClk1();
   digitalWrite(pinOutSenalDigital, bit1);
@@ -132,19 +118,17 @@ void cambiarYEnviarClk1() {
   estadoClk1 = !estadoClk1;
 }
 
-volatile unsigned long tiempo = 0;
 void clk1Detection() {
   // Serial.println("Int: ");
   digitalWrite(ledPin, estadoClk1);
-  noInterrupts();
-  tiempo = millis();
-  interrupts();
+  // noInterrupts();
+  // interrupts();
   Timer1.start();
   // Timer1.detachInterrupt();
   // Timer1.start();
 }
 
-int cuenta = 0;
+volatile byte cuenta = 0;
 void ISR_Callback() {
   // Serial.println("Cuenta: " + String(cuenta));
   if (cuenta == 0) {
@@ -155,15 +139,50 @@ void ISR_Callback() {
   // Serial.println("Tiempo: " + String(resta));
   bool senal = digitalRead(pinInSenalDigital);
   Serial.println("ISR: " + String(senal));
+  buffer[cuenta - 1] = senal;
 
   if (cuenta == 3) {
     // Serial.println("llegue");
     // Timer1.detachInterrupt();
-
     cuenta = 0;
     Timer1.stop();
     Serial.println();
   } else {
     cuenta = cuenta + 1;
   }
+}
+
+void codificar() {
+  byte valor;
+  if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == LOW) {
+    valor = 0;
+    escribirSenalAnaloga(falsaTierra, menosRmedios);
+  } else if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == HIGH) {
+    valor = 1;
+    escribirSenalAnaloga(Rmedios, falsaTierra);
+  } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == LOW) {
+    valor = 2;
+    escribirSenalAnaloga(falsaTierra, Rmedios);
+  } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == HIGH) {
+    valor = 3;
+    escribirSenalAnaloga(menosRmedios, falsaTierra);
+  } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == LOW) {
+    valor = 4;
+    escribirSenalAnaloga(R, R);
+  } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == HIGH) {
+    valor = 5;
+    escribirSenalAnaloga(menosR, R);
+  } else if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == LOW) {
+    valor = 6;
+    escribirSenalAnaloga(menosR, menosR);
+  } else { // if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == HIGH)
+    valor = 7;
+    escribirSenalAnaloga(R, menosR);
+  }
+  Serial.println("Valor: " + String(valor) + "\n\n");
+}
+
+void escribirSenalAnaloga(byte ejeX, byte ejeY) {
+  analogWrite(pinX, ejeX);
+  analogWrite(pinY, ejeY);
 }
