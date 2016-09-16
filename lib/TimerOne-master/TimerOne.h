@@ -150,6 +150,7 @@ class TimerOne
 	TIMSK1 = 0;
     }
     static void (*isrCallback)();
+    static void isrDefaultUnused();
 
   private:
     // properties
@@ -163,6 +164,12 @@ class TimerOne
 
 #elif defined(__arm__) && defined(CORE_TEENSY)
 
+#if defined(KINETISK)
+#define F_TIMER F_BUS
+#elif defined(KINETISL)
+#define F_TIMER (F_PLL/2)
+#endif
+
   public:
     //****************************
     //  Configuration
@@ -171,7 +178,54 @@ class TimerOne
 	setPeriod(microseconds);
     }
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
-	const unsigned long cycles = (F_BUS / 2000000) * microseconds;
+	const unsigned long cycles = (F_TIMER / 2000000) * microseconds;
+  // A much faster if-else
+  // This is like a binary serch tree and no more than 3 conditions are evaluated.
+  // I haven't checked if this becomes significantly longer ASM than the simple ladder.
+  // It looks very similar to the ladder tho: same # of if's and else's
+ 
+  /*
+  // This code does not work properly in all cases :(
+  // https://github.com/PaulStoffregen/TimerOne/issues/17 
+  if (cycles < TIMER1_RESOLUTION * 16) {
+    if (cycles < TIMER1_RESOLUTION * 4) {
+      if (cycles < TIMER1_RESOLUTION) {
+        clockSelectBits = 0;
+        pwmPeriod = cycles;
+      }else{
+        clockSelectBits = 1;
+        pwmPeriod = cycles >> 1;
+      }
+    }else{
+      if (cycles < TIMER1_RESOLUTION * 8) {
+        clockSelectBits = 3;
+        pwmPeriod = cycles >> 3;
+      }else{
+        clockSelectBits = 4;
+        pwmPeriod = cycles >> 4;
+      }
+    }
+  }else{
+    if (cycles > TIMER1_RESOLUTION * 64) {
+      if (cycles > TIMER1_RESOLUTION * 128) {
+        clockSelectBits = 7;
+        pwmPeriod = TIMER1_RESOLUTION - 1;
+      }else{
+        clockSelectBits = 7;
+        pwmPeriod = cycles >> 7;
+      }
+    }
+    else{
+      if (cycles > TIMER1_RESOLUTION * 32) {
+        clockSelectBits = 6;
+        pwmPeriod = cycles >> 6;
+      }else{
+        clockSelectBits = 5;
+        pwmPeriod = cycles >> 5;
+      }
+    }
+  }
+  */
 	if (cycles < TIMER1_RESOLUTION) {
 		clockSelectBits = 0;
 		pwmPeriod = cycles;
@@ -207,6 +261,7 @@ class TimerOne
 		clockSelectBits = 7;
 		pwmPeriod = TIMER1_RESOLUTION - 1;
 	}
+
 	uint32_t sc = FTM1_SC;
 	FTM1_SC = 0;
 	FTM1_MOD = pwmPeriod;
@@ -247,9 +302,9 @@ class TimerOne
     void pwm(char pin, unsigned int duty) __attribute__((always_inline)) {
 	setPwmDuty(pin, duty);
 	if (pin == TIMER1_A_PIN) {
-		CORE_PIN3_CONFIG = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
+		*portConfigRegister(TIMER1_A_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
 	} else if (pin == TIMER1_B_PIN) {
-		CORE_PIN4_CONFIG = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
+		*portConfigRegister(TIMER1_B_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
 	}
     }
     void pwm(char pin, unsigned int duty, unsigned long microseconds) __attribute__((always_inline)) {
@@ -258,9 +313,9 @@ class TimerOne
     }
     void disablePwm(char pin) __attribute__((always_inline)) {
 	if (pin == TIMER1_A_PIN) {
-		CORE_PIN3_CONFIG = 0;
+		*portConfigRegister(TIMER1_A_PIN) = 0;
 	} else if (pin == TIMER1_B_PIN) {
-		CORE_PIN4_CONFIG = 0;
+		*portConfigRegister(TIMER1_B_PIN) = 0;
 	}
     }
 
@@ -281,11 +336,14 @@ class TimerOne
 	NVIC_DISABLE_IRQ(IRQ_FTM1);
     }
     static void (*isrCallback)();
+    static void isrDefaultUnused();
 
   private:
     // properties
     static unsigned short pwmPeriod;
     static unsigned char clockSelectBits;
+
+#undef F_TIMER
 
 #endif
 };
