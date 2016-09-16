@@ -3,14 +3,19 @@
  *              LIBRERIAS y CONSTANTES
  ***********************************************************************
  */
-int pinSenalDigital = 5;
-int ts = 1000; // tiempo en millis
+const byte pinSenalDigital = 5; // Pin de Salida de Senal
+const int ts = 1000;            // tiempo en millis
+// Constantes tipo byte va de 0 a 255, es suficiente para representar los pines
+const byte pinclk1 = 12;     // pin clock triada
+const byte ledPin = 13;      // Indicador de interrupcion, led de salida
+const byte interruptPin = 2; // Pin de entrada de la interrupcion
+int tensionX, tensionY;      // valor analogico de tension
+const byte pinX = 11;
+const byte pinmenosX = 10;
+const byte pinY = 9;
+const byte pinmenosY = 8;
 
-int tensionX, tensionY; // valor analogico de tension
-int pinX = 11;
-int pinmenosX = 10;
-int pinY = 9;
-int pinmenosY = 8;
+bool estado = HIGH; // Estado inicial de clk1
 
 /*
  ***********************************************************************
@@ -18,12 +23,16 @@ int pinmenosY = 8;
  ***********************************************************************
  */
 void setup() {
-  Serial.begin(9600);               // Tasa de baudios del puerto serial
-  pinMode(pinSenalDigital, OUTPUT); // Señal de pulsos aleatorios
-  pinMode(pinX, OUTPUT);            // Salida de tension sobre el eje X
-  pinMode(pinY, OUTPUT);            // "               " sobre el eje Y
-  pinMode(pinmenosX, OUTPUT);       // Salida de tension sobre el eje -X
-  pinMode(pinmenosY, OUTPUT);       // "               " sobre el eje -Y
+  Serial.begin(9600);                  // Tasa de baudios del puerto serial
+  pinMode(pinSenalDigital, OUTPUT);    // Señal de pulsos aleatorios
+  pinMode(pinclk1, OUTPUT);            // Señal clk1
+  pinMode(pinX, OUTPUT);               // Salida de tension sobre el eje X
+  pinMode(pinY, OUTPUT);               // "               " sobre el eje Y
+  pinMode(pinmenosX, OUTPUT);          // Salida de tension sobre el eje -X
+  pinMode(pinmenosY, OUTPUT);          // "               " sobre el eje -Y
+  pinMode(interruptPin, INPUT_PULLUP); // Pin como entrada de la interrupcion
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(interruptPin), clk1detection, CHANGE);
 }
 
 /*
@@ -41,7 +50,7 @@ int generadorNumeroAletorio() {
      numeros seudo-aeatorios, cargando una semilla cambiante
      generamos numeros aleatorios*/
   randomSeed(millis());
-  azar = random(0, 8); // genera numero aleatorio desde random(n,(m-1))
+  int azar = random(0, 8); // genera numero aleatorio desde random(n,(m-1))
   Serial.println(azar);
   return azar;
 }
@@ -52,7 +61,7 @@ void generaSenalAleatoria(int azar) {
     escribirSenalDigital(LOW, LOW, LOW);
     break;
   case 1: // Si el numero aleatorio es 1 = 001
-    escribirSenalDigital(LOW, LOW, LOW);
+    escribirSenalDigital(LOW, LOW, HIGH);
     break;
   case 2: // Si el numero aleatorio es 2 = 010
     escribirSenalDigital(LOW, HIGH, LOW);
@@ -76,38 +85,45 @@ void generaSenalAleatoria(int azar) {
 }
 
 void primerCuadrante() {
-  analogWrite(X, tensionX);
-  analogWrite(Y, tensionY);
-  analogWrite(menosX, 0);
-  analogWrite(menosY, 0);
+  analogWrite(pinX, tensionX);
+  analogWrite(pinY, tensionY);
+  analogWrite(pinmenosX, 0);
+  analogWrite(pinmenosY, 0);
 }
 
 void segundoCuadrante() {
-  analogWrite(menosX, tensionX);
-  analogWrite(Y, tensionY);
-  analogWrite(X, 0);
-  analogWrite(menosY, 0);
+  analogWrite(pinmenosX, tensionX);
+  analogWrite(pinY, tensionY);
+  analogWrite(pinX, 0);
+  analogWrite(pinmenosY, 0);
 }
 
 void tercerCuadrante() {
-  analogWrite(menosX, tensionX);
-  analogWrite(menosY, tensionY);
-  analogWrite(X, 0);
-  analogWrite(Y, 0);
+  analogWrite(pinmenosX, tensionX);
+  analogWrite(pinmenosY, tensionY);
+  analogWrite(pinX, 0);
+  analogWrite(pinY, 0);
 }
 
 void cuartoCuadrante() {
-  analogWrite(X, tensionX);
-  analogWrite(menosY, tensionY);
-  analogWrite(menosX, 0);
-  analogWrite(Y, 0);
+  analogWrite(pinX, tensionX);
+  analogWrite(pinmenosY, tensionY);
+  analogWrite(pinmenosX, 0);
+  analogWrite(pinY, 0);
 }
 
 void escribirSenalDigital(bool bit1, bool bit2, bool bit3) {
+  digitalWrite(pinclk1, estado);
+  estado = !estado;
   digitalWrite(pinSenalDigital, bit1);
   delay(ts);
   digitalWrite(pinSenalDigital, bit2);
   delay(ts);
   digitalWrite(pinSenalDigital, bit3);
   delay(ts);
+}
+
+void clk1detection() {
+  Serial.println("Sex");
+  digitalWrite(ledPin, estado);
 }
