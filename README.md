@@ -3,8 +3,11 @@ Este es un repositorio para versionar proyectos afines a las comunicaciones digi
 
 Reto #1: Generar una señal de pulsos aleatoria de 8 bits incrustando semilla cambiante.
 
-## Microcontrolador seleccionado para el reto #1  
-![grafo1](http://i65.tinypic.com/10cp6b4.jpg "grafo1")
+## Señales aleatorias de 8bits 
+![grafo1](https://github.com/ingelectronicadj/Comunicaciones-Digitales/blob/master/imagenes/cc.png?raw=true "grafo1")
+
+## Geometria de puntos 
+![grafo2](https://github.com/ingelectronicadj/Comunicaciones-Digitales/blob/master/imagenes/cuadratura.png?raw=true "grafo2")
 
 ### Autor 
 * Diego Javier Mena @ingelectronicadj 
