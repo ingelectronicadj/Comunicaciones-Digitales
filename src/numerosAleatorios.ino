@@ -18,15 +18,17 @@ const byte pinInSenalDigital = 4; // Pin de entrada de la senal digital
 
 bool estadoClk1 = LOW; // Estado inicial de clk1
 
-const byte pinX = 8;
-const byte pinY = 9;
-const byte pinFalsaTierra = 7;
+const byte pinX = 9;
+const byte pinY = 8;
+const byte pinMenosX = 7;
+const byte pinMenosY = 6;
+//const byte pinFalsaTierra = 7;
 
-const byte falsaTierra = 127;
-const byte R = 255;
-const byte menosR = 0;
-const byte Rmedios = 191;
-const byte menosRmedios = 64;
+//const byte falsaTierra = 127;
+const byte R = HIGH;
+const byte menosR = HIGH;
+const byte Rmedios = HIGH/2;
+const byte menosRmedios = HIGH/2;
 
 volatile bool buffer[] = {LOW, LOW, LOW};
 
@@ -43,8 +45,10 @@ void setup() {
   pinMode(pinOutClk1, OUTPUT);      // Señal clk1
   pinMode(pinX, OUTPUT);            // Salida de tension sobre el eje X
   pinMode(pinY, OUTPUT);            // "               " sobre el eje Y
-  pinMode(pinFalsaTierra, OUTPUT);  // Referencia de Salida X y Y
-  analogWrite(pinFalsaTierra, falsaTierra);
+  pinMode(pinMenosX, OUTPUT);            // Salida de tension sobre el eje X
+  pinMode(pinMenosY, OUTPUT);            // "               " sobre el eje Y
+  //pinMode(pinFalsaTierra, OUTPUT);  // Referencia de Salida X y Y
+  //analogWrite(pinFalsaTierra, falsaTierra);
   pinMode(ledPin, OUTPUT);
   Timer1.initialize(deltaT); // 180 ms
   Timer1.attachInterrupt(ISR_Callback);
@@ -156,33 +160,35 @@ void codificar() {
   byte valor;
   if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == LOW) {
     valor = 0;
-    escribirSenalAnaloga(falsaTierra, menosRmedios);
+    escribirSenalAnaloga(0, 0, 0, menosRmedios);
   } else if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == HIGH) {
     valor = 1;
-    escribirSenalAnaloga(Rmedios, falsaTierra);
+    escribirSenalAnaloga(Rmedios, 0, 0, 0);
   } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == LOW) {
     valor = 2;
-    escribirSenalAnaloga(falsaTierra, Rmedios);
+    escribirSenalAnaloga(0, Rmedios, 0, 0);
   } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == HIGH) {
     valor = 3;
-    escribirSenalAnaloga(menosRmedios, falsaTierra);
+    escribirSenalAnaloga(0, 0, menosRmedios, 0);
   } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == LOW) {
     valor = 4;
-    escribirSenalAnaloga(R, R);
+    escribirSenalAnaloga(R, R, 0, 0);
   } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == HIGH) {
     valor = 5;
-    escribirSenalAnaloga(menosR, R);
+    escribirSenalAnaloga(0, R, menosR, 0);
   } else if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == LOW) {
     valor = 6;
-    escribirSenalAnaloga(menosR, menosR);
+    escribirSenalAnaloga(0, 0, menosR, menosR);
   } else { // if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == HIGH)
     valor = 7;
-    escribirSenalAnaloga(R, menosR);
+    escribirSenalAnaloga(R, 0, 0, menosR);
   }
   Serial.println("Valor: " + String(valor) + "\n\n");
 }
 
-void escribirSenalAnaloga(byte ejeX, byte ejeY) {
-  analogWrite(pinX, ejeX);
-  analogWrite(pinY, ejeY);
+void escribirSenalAnaloga(byte ejeX, byte ejeY, byte ejeMenosX, byte ejeMenosY) {
+  digitalWrite(pinX, ejeX);
+  digitalWrite(pinY, ejeY);
+  digitalWrite(pinMenosX, ejeMenosX);
+  digitalWrite(pinMenosY, ejeMenosY);
 }
