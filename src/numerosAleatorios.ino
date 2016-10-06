@@ -161,35 +161,35 @@ void codificar() {
   if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == LOW) {
     valor = 0;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, 0, 0, 0, 0, 0, 0, HIGH);
+    escribirSenalAnaloga(LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH);
   } else if (buffer[0] == LOW && buffer[1] == LOW && buffer[2] == HIGH) {
     valor = 1;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, 0, 0, 0, HIGH, 0, 0, 0);
+    escribirSenalAnaloga(LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW);
   } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == LOW) {
     valor = 2;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, 0, 0, 0, 0, HIGH, 0, 0);
+    escribirSenalAnaloga(LOW, LOW, LOW, LOW, LOW, HIGH, LOW, LOW);
   } else if (buffer[0] == LOW && buffer[1] == HIGH && buffer[2] == HIGH) {
     valor = 3;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, 0, 0, 0, 0, 0, HIGH, 0);
+    escribirSenalAnaloga(LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW);
   } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == LOW) {
     valor = 4;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(HIGH, HIGH, 0, 0, 0, 0, 0, 0);
+    escribirSenalAnaloga(HIGH, HIGH, LOW, LOW, LOW, LOW, LOW, LOW);
   } else if (buffer[0] == HIGH && buffer[1] == LOW && buffer[2] == HIGH) {
     valor = 5;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, HIGH, HIGH, 0, 0, 0, 0, 0);
+    escribirSenalAnaloga(LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW);
   } else if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == LOW) {
     valor = 6;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(0, 0, HIGH, HIGH, 0, 0, 0, 0);
+    escribirSenalAnaloga(LOW, LOW, HIGH, HIGH, LOW, LOW, LOW, LOW);
   } else { // if (buffer[0] == HIGH && buffer[1] == HIGH && buffer[2] == HIGH)
     valor = 7;
     //pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
-    escribirSenalAnaloga(HIGH, 0, 0, HIGH, 0, 0, 0, 0);
+    escribirSenalAnaloga(HIGH, LOW, LOW, HIGH, LOW, LOW, LOW, LOW);
   }
   Serial.println("Valor: " + String(valor) + "\n\n");
 }
@@ -203,5 +203,5 @@ void escribirSenalAnaloga(byte ejeX, byte ejeY, byte ejeMenosX, byte ejeMenosY, 
   digitalWrite(pinYmedios, ejeYmedios);
   digitalWrite(pinMenosXmedios, ejeMenosXmedios);
   digitalWrite(pinMenosYmedios, ejeMenosYmedios);
-
+  //delay(5);
 }
