@@ -234,35 +234,35 @@ void clk2Detection() {
   byte posY = voltajeAPosicion(voltageY);
 
   if (posX == 2 && posY == 1) { // 000
-    Serial.println('Posicion: 000');
+    Serial.println("Posicion: 000");
   } else if (posX == 3 && posY == 2) { // 001
-    Serial.println('Posicion: 001');
+    Serial.println("Posicion: 001");
   } else if (posX == 2 && posY == 3) { // 010
-    Serial.println('Posicion: 010');
+    Serial.println("Posicion: 010");
   } else if (posX == 1 && posY == 2) { // 011
-    Serial.println('Posicion: 011');
+    Serial.println("Posicion: 011");
   } else if (posX == 4 && posY == 4) { // 100
-    Serial.println('Posicion: 100');
+    Serial.println("Posicion: 100");
   } else if (posX == 0 && posY == 4) { // 101
-    Serial.println('Posicion: 101');
+    Serial.println("Posicion: 101");
   } else if (posX == 0 && posY == 0) { // 110
-    Serial.println('Posicion: 110');
+    Serial.println("Posicion: 110");
   } else { // (posX == 4 && posY == 0) // 111
-    Serial.println('Posicion: 111');
+    Serial.println("Posicion: 111");
   }
 }
 
 byte voltajeAPosicion(float voltaje) {
   byte posicion = 0;
-  if (voltaje >= 0 && voltaje < 0.625) {
+  if (voltaje >= 0 && voltaje < 0.625) { // rango de 0v
     posicion = 0;
-  } else if (voltaje >= 0.625 && voltaje < 1.875) {
+  } else if (voltaje >= 0.625 && voltaje < 1.875) { // rango de 1.25v
     posicion = 1;
-  } else if (voltaje >= 1.875 && voltaje < 3.125) {
+  } else if (voltaje >= 1.875 && voltaje < 3.125) { // rango de 2.5v
     posicion = 2;
-  } else if (voltaje >= 3.125 && voltaje < 4.375) {
+  } else if (voltaje >= 3.125 && voltaje < 4.375) { // rango de 3.75v
     posicion = 3;
-  } else { // voltaje >= 4.375 && voltaje < 5
+  } else { // voltaje >= 4.375 && voltaje < 5 // rango de 5v
     posicion = 4;
   }
   return posicion;
