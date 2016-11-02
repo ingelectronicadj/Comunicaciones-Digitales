@@ -17,12 +17,12 @@ const byte pinInClk1 = 2;         // Pin de entrada de la interrupcion
 const byte pinInSenalDigital = 3; // Pin de entrada de la senal digital
 
 const byte pinOutClk2 = 46;         // Pin de salida del CLK2
-const byte pinInClk2 = 18;          // Pin de entrada de la interrupcion
-const byte pinInSenalAnalogaX = A8; // Pin de entrada de la senal analoga
-const byte pinInSenalAnalogaY = A9; // Pin de entrada de la senal analoga
+const byte pinInClk2 = 18;          // Pin de entrada de la interrupcion auxiliar para decodificar
+const byte pinInSenalAnalogaX = A8; // Pin de entrada de la senal analoga decodificada
+const byte pinInSenalAnalogaY = A9; // Pin de entrada de la senal analoga decodificada
 
 bool estadoClk1 = LOW; // Estado inicial de clk1
-bool estadoClk2 = LOW; // Estado inicial de clk1
+bool estadoClk2 = LOW; // Estado inicial de clk2
 
 const byte pinX = 11;
 const byte pinY = 10;
@@ -232,7 +232,6 @@ void clk2Detection() {
   int y = analogRead(pinInSenalAnalogaY);
   float voltageY = y * (5.0 / 1023.0);
   byte posY = voltajeAPosicion(voltageY);
-
   if (posX == 2 && posY == 1) { // 000
     Serial.println("Posicion: 000");
   } else if (posX == 3 && posY == 2) { // 001
