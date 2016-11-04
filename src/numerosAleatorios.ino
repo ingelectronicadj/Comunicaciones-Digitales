@@ -8,8 +8,8 @@
 
 const byte pinOutSenalDigital = 13; // Pin de Salida de Senal
 const byte pinOutClk1 = 12;         // pin clock triada
-const int ts = 25;                  // tiempo en millis
-const long deltaT = 22500;          // microsegundos 180000us 180ms
+const int ts = 15;                  // tiempo en millis
+const long deltaT = 12500;          // microsegundos 180000us 180ms
 // Constantes tipo byte va de 0 a 255, es suficiente para representar los pines
 
 const byte ledPin = 53;           // Indicador de interrupcion, led de salida
