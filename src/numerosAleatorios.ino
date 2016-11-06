@@ -64,7 +64,7 @@ void setup() {
   Timer1.attachInterrupt(ISR_Callback);
   Timer1.stop();
   attachInterrupt(digitalPinToInterrupt(pinInClk1), clk1Detection, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(pinInClk2), clk2Detection, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(pinInClk2), clk2Decodifica, CHANGE);
 }
 
 /*
@@ -202,7 +202,7 @@ void codificar() {
     // pinX,pinY,pinMenosX,pinMenosY,pinXmedios,pinYmedios,pinMenosXmedios,pinMenosYmedios
     escribirSenalAnaloga(HIGH, LOW, LOW, HIGH, LOW, LOW, LOW, LOW);
   }
-  Serial.println("Valor: " + String(valor) + "\n\n");
+//  Serial.println("Valor: " + String(valor) + "\n\n");
 }
 
 void escribirSenalAnaloga(bool ejeX, bool ejeY, bool ejeMenosX, bool ejeMenosY,
@@ -224,7 +224,7 @@ void cambiarYEnviarClk2() {
   estadoClk2 = !estadoClk2;
 }
 
-void clk2Detection() {
+void clk2Decodifica() {
   int x = analogRead(pinInSenalAnalogaX);
   float voltageX = x * (5.0 / 1023.0);
   byte posX = voltajeAPosicion(voltageX);
@@ -233,21 +233,21 @@ void clk2Detection() {
   float voltageY = y * (5.0 / 1023.0);
   byte posY = voltajeAPosicion(voltageY);
   if (posX == 2 && posY == 1) { // 000
-    Serial.println("Posicion: 000");
+    Serial.println("Recupera: 000 = 0");
   } else if (posX == 3 && posY == 2) { // 001
-    Serial.println("Posicion: 001");
+    Serial.println("Recupera: 001 = 1");
   } else if (posX == 2 && posY == 3) { // 010
-    Serial.println("Posicion: 010");
+    Serial.println("Recupera: 010 = 2");
   } else if (posX == 1 && posY == 2) { // 011
-    Serial.println("Posicion: 011");
+    Serial.println("Recupera: 011 = 3");
   } else if (posX == 4 && posY == 4) { // 100
-    Serial.println("Posicion: 100");
+    Serial.println("Recupera: 100 = 4");
   } else if (posX == 0 && posY == 4) { // 101
-    Serial.println("Posicion: 101");
+    Serial.println("Recupera: 101 = 5");
   } else if (posX == 0 && posY == 0) { // 110
-    Serial.println("Posicion: 110");
+    Serial.println("Recupera: 110 = 6");
   } else { // (posX == 4 && posY == 0) // 111
-    Serial.println("Posicion: 111");
+    Serial.println("Recupera: 111 = 7");
   }
 }
 
