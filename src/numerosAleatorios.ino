@@ -8,8 +8,8 @@
 
 const byte pinOutSenalDigital = 13; // Pin de Salida de Senal
 const byte pinOutClk1 = 12;         // pin clock triada
-const int ts = 15;                  // tiempo en millis
-const long deltaT = 12500;          // microsegundos 180000us 180ms
+const int ts = 30;                  // tiempo en millis
+const long deltaT = 25000;          // microsegundos 180000us 180ms
 // Constantes tipo byte va de 0 a 255, es suficiente para representar los pines
 
 const byte ledPin = 53;           // Indicador de interrupcion, led de salida
@@ -249,17 +249,18 @@ void clk2Decodifica() {
   } else { // (posX == 4 && posY == 0) // 111
     Serial.println("Recupera: 111 = 7");
   }
+  Serial.println("");
 }
 
 byte voltajeAPosicion(float voltaje) {
   byte posicion = 0;
   if (voltaje >= 0 && voltaje < 0.625) { // rango de 0v
     posicion = 0;
-  } else if (voltaje >= 0.625 && voltaje < 1.875) { // rango de 1.25v
+  } else if (voltaje >= 0.625 && voltaje < 1.5) { // rango de 1.25v
     posicion = 1;
-  } else if (voltaje >= 1.875 && voltaje < 3.125) { // rango de 2.5v
+  } else if (voltaje >= 1.5 && voltaje < 2.75) { // rango de 2.5v
     posicion = 2;
-  } else if (voltaje >= 3.125 && voltaje < 4.375) { // rango de 3.75v
+  } else if (voltaje >= 2.75 && voltaje < 3.7) { // rango de 3.75v
     posicion = 3;
   } else { // voltaje >= 4.375 && voltaje < 5 // rango de 5v
     posicion = 4;
